@@ -1,4 +1,6 @@
 .DS_Store
+Agent.md
+AGENTS.md
 .env
 .env.*
 !.env.example
@@ -23,4 +25,3 @@ vector_db/
 dist/
 build/
 *.egg-info/
-
