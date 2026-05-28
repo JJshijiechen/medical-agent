@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Medical Agent Console</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="rail" aria-label="Session and service status">
+        <div class="brand-lockup">
+          <div class="mark" aria-hidden="true">
+            <svg viewBox="0 0 36 36" role="img">
+              <path d="M18 3.8 29.9 8.9v9.2c0 7.4-4.7 11.7-11.9 14.2C10.8 29.8 6.1 25.5 6.1 18.1V8.9L18 3.8Z" />
+              <path d="M18 10.1v15.8M10.9 18h14.2" />
+            </svg>
+          </div>
+          <div>
+            <h1>Medical Agent</h1>
+            <p>Patient intake console</p>
+          </div>
+        </div>
+
+        <section class="status-strip" aria-live="polite">
+          <span class="dot" id="statusDot"></span>
+          <div>
+            <strong id="serviceStatus">Checking API</strong>
+            <small id="serviceDetail">Waiting for /health</small>
+          </div>
+        </section>
+
+        <label class="field-label" for="sessionId">Session ID</label>
+        <div class="input-row">
+          <input id="sessionId" value="demo-patient" autocomplete="off" />
+          <button class="icon-button" id="newSessionButton" title="New session" aria-label="New session">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+          </button>
+        </div>
+
+        <nav class="task-nav" aria-label="Workflow tabs">
+          <button class="tab-button active" data-panel="chatPanel">
+            <span class="tab-icon pulse"></span>
+            Chat
+          </button>
+          <button class="tab-button" data-panel="intakePanel">
+            <span class="tab-icon intake"></span>
+            Intake
+          </button>
+          <button class="tab-button" data-panel="formsPanel">
+            <span class="tab-icon form"></span>
+            Forms
+          </button>
+          <button class="tab-button" data-panel="workflowPanel">
+            <span class="tab-icon workflow"></span>
+            Workflow
+          </button>
+        </nav>
+
+        <div class="quick-actions">
+          <button id="sampleChestPain">Chest pain demo</button>
+          <button id="sampleMedicare">Medicare screening demo</button>
+          <button id="sampleReminder">Reminder demo</button>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Virtual consultation workspace</p>
+            <h2>Multi-turn medical agent with Medicare RAG</h2>
+          </div>
+          <button class="secondary-action" id="ingestButton">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 20h14" /></svg>
+            Ingest offline Medicare sample
+          </button>
+        </header>
+
+        <section class="visual-band" aria-label="Consultation signal">
+          <svg class="waveform" viewBox="0 0 720 96" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 52H82l20-28 28 56 38-56 32 28h70l22-18 24 18h84l19-30 26 55 34-55 30 30h211" />
+          </svg>
+          <div class="band-copy">
+            <strong>Safety-first routing</strong>
+            <span>Red flags, citations, emotion state, and follow-up actions stay visible while you work.</span>
+          </div>
+        </section>
+
+        <div class="panel active" id="chatPanel">
+          <section class="primary-panel chat-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Patient conversation</p>
+                <h3>Medical chat</h3>
+              </div>
+              <button class="ghost-button" id="clearChatButton">Clear transcript</button>
+            </div>
+            <div class="transcript" id="transcript" aria-live="polite"></div>
+            <form class="composer" id="chatForm">
+              <textarea id="chatMessage" rows="3" placeholder="Ask about symptoms, Medicare coverage, or next steps..."></textarea>
+              <button type="submit">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" /></svg>
+                Send
+              </button>
+            </form>
+          </section>
+        </div>
+
+        <div class="panel" id="intakePanel">
+          <section class="primary-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Real-time symptom intake</p>
+                <h3>Capture missing clinical context</h3>
+              </div>
+            </div>
+            <form class="stack-form" id="intakeForm">
+              <label>
+                Symptom note
+                <textarea id="intakeText" rows="5">I have chest pain for 2 days, severity 8/10</textarea>
+              </label>
+              <button type="submit">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+                Analyze symptoms
+              </button>
+            </form>
+          </section>
+        </div>
+
+        <div class="panel" id="formsPanel">
+          <section class="primary-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Medical form validation</p>
+                <h3>Medicare intake form</h3>
+              </div>
+            </div>
+            <form class="form-grid" id="medicalForm">
+              <label>
+                Full name
+                <input id="fullName" value="Jane Patient" />
+              </label>
+              <label>
+                Date of birth
+                <input id="dateOfBirth" value="1950-01-02" />
+              </label>
+              <label>
+                Medicare number
+                <input id="medicareNumber" value="1eg4te5mk73" />
+              </label>
+              <label class="checkbox-row">
+                <input id="consentToContact" type="checkbox" checked />
+                Consent to contact
+              </label>
+              <button type="submit">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                Validate form
+              </button>
+            </form>
+          </section>
+        </div>
+
+        <div class="panel" id="workflowPanel">
+          <section class="primary-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Medicare workflow automation</p>
+                <h3>Follow-up reminder</h3>
+              </div>
+            </div>
+            <form class="stack-form" id="reminderForm">
+              <label>
+                Reminder request
+                <textarea id="reminderText" rows="4">remind me tomorrow to follow up about blood pressure</textarea>
+              </label>
+              <label>
+                Channel
+                <select id="reminderChannel">
+                  <option value="api">API dry-run</option>
+                  <option value="slack">Slack</option>
+                  <option value="telegram">Telegram</option>
+                </select>
+              </label>
+              <label>
+                Recipient ID
+                <input id="recipientId" placeholder="Slack channel or Telegram chat ID" />
+              </label>
+              <button type="submit">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" /></svg>
+                Create reminder
+              </button>
+            </form>
+          </section>
+        </div>
+      </main>
+
+      <aside class="inspector" aria-label="Agent response inspector">
+        <section>
+          <div class="inspector-head">
+            <p class="eyebrow">Model route</p>
+            <strong id="providerLabel">Not run</strong>
+          </div>
+          <small id="providerDetail">Chat calls will show OpenAI or fallback here.</small>
+        </section>
+
+        <section>
+          <div class="inspector-head">
+            <p class="eyebrow">Emotion</p>
+            <strong id="emotionLabel">Not run</strong>
+          </div>
+          <div class="meter" aria-hidden="true"><span id="emotionMeter"></span></div>
+          <small id="comfortStrategy">Run chat or intake to see comfort strategy.</small>
+        </section>
+
+        <section>
+          <div class="inspector-head">
+            <p class="eyebrow">Safety flags</p>
+            <strong id="safetyCount">0</strong>
+          </div>
+          <ul class="signal-list" id="safetyList"></ul>
+        </section>
+
+        <section>
+          <div class="inspector-head">
+            <p class="eyebrow">Citations</p>
+            <strong id="citationCount">0</strong>
+          </div>
+          <ul class="signal-list" id="citationList"></ul>
+        </section>
+
+        <section>
+          <div class="inspector-head">
+            <p class="eyebrow">Last API result</p>
+            <button class="copy-button" id="copyJsonButton">Copy</button>
+          </div>
+          <pre id="jsonOutput">{}</pre>
+        </section>
+      </aside>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

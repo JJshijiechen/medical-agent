@@ -1,0 +1,76 @@
+services:
+  api:
+    build: .
+    container_name: medical_agent_api
+    restart: unless-stopped
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./vector_db:/app/vector_db
+      - ./logs:/app/logs
+    command: uvicorn src.Server:app --host 0.0.0.0 --port 8000
+    networks:
+      - medical_agent_network
+
+  slack_bot:
+    build: .
+    container_name: medical_agent_slack
+    restart: unless-stopped
+    profiles:
+      - slack
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./vector_db:/app/vector_db
+      - ./logs:/app/logs
+    command: python -m src.SlackWebHook
+    networks:
+      - medical_agent_network
+
+  telegram_bot:
+    build: .
+    container_name: medical_agent_telegram
+    restart: unless-stopped
+    profiles:
+      - telegram
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./vector_db:/app/vector_db
+      - ./logs:/app/logs
+    command: python -m src.TelegramBot
+    networks:
+      - medical_agent_network
+
+  redis:
+    image: redis/redis-stack-server:latest
+    container_name: medical_agent_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - medical_agent_network
+
+networks:
+  medical_agent_network:
+    driver: bridge
+
+volumes:
+  redis_data:
+    driver: local
